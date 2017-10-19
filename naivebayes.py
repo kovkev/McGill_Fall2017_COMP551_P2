@@ -25,6 +25,9 @@ class NaiveBayes(object):
             given_class_probability = 1
             feature_probability = 1
             for feature in features:
+                # Ignore any feature we've never seen before
+                if feature not in self._features:
+                    continue
                 findex = self._features[feature]
                 feature_probability *= self._feature_probabilies[findex]
                 # Perform laplace filtering
@@ -32,12 +35,9 @@ class NaiveBayes(object):
                     (self.laplace + self._frequencies[cindex][findex]) \
                     / (self._class_counts[cindex] + self.laplace
                         * len(self._features))
-                if given_class == 0.0:
-                    pass
                 given_class_probability *= given_class
             probability = given_class_probability * class_probability \
                 / feature_probability
-            print(probability)
             if probability > predicted_max:
                 predicted_class = class_
                 predicted_max = probability
