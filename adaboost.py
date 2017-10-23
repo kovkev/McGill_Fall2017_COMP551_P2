@@ -2,6 +2,7 @@
 # It helps reduce bias
 # Since Naive Bayes is considered to be high bias/low variance
 
+import random
 
 import time
 current_milli_time = lambda: int(round(time.time() * 1000))
@@ -17,18 +18,23 @@ class AdaBoost(object):
   def train_set(self, dataset, M=20):
     M = 20
     N = len(dataset)
-    ws = [1.0 for i in dataset]
+    ws = [1.0/N for i in dataset]
     models = [self.model() for i in range(M)]
     errs = [1.0 for i in range(M)]
     alphas = [1.0 for i in range(M)]
+    part = 0.8
 
     for m in range(M):
       print("m is", m)
-      for n in range(N):
-        example = dataset[n]
+      sub_sample_size = int(part * N)
+      sub_sample = random.choices(dataset, ws, k=sub_sample_size)
+
+      for n in range(len(sub_sample)):
+        example = sub_sample[n]
         # print("n is")
         # print(ws[n])
-        models[m].train(*example, float(ws[n]))
+        # models[m].train(*example, float(ws[n]))
+        models[m].train(*example, 1.0)
 
       print("predicting %s examples" % N)
       incorrects = [1 if models[m].predict(*dataset[n][1:]) != dataset[n][0] else 0 for n in range(N)]
